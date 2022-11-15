@@ -1,3 +1,5 @@
+# A set of common Bash functions useful for both suite runner and separate benchmark runners
+
 ANSI_COLOR_RESET="\e[0m"
 ANSI_COLOR_RED_FG="\e[31m"
 ANSI_COLOR_GREEN_FG="\e[32m"

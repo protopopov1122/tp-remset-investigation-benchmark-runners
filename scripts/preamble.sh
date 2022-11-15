@@ -1,4 +1,6 @@
-export BENCHMARK_SUITE_STARTED_AT="$(date '+%s')"
+# Code for initial suite runner configuration
+
+export BENCHMARK_SUITE_RUNNER_START_TIMESTAMP="$(date '+%s')"
 
 # Check JAVA_HOME
 if [[ "x$JAVA_HOME" == "x" ]]; then
@@ -10,34 +12,36 @@ if [[ ! -d "$JAVA_HOME" ]]; then
 fi
 
 # Check benchmark base dir
-if [[ "x$BENCHMARK_BASE_DIR" == "x" ]]; then
-    fatal "BENCHMARK_BASE_DIR environment variable is not defined"
+if [[ "x$BENCHMARK_SUITE_BASE_DIR" == "x" ]]; then
+    fatal "BENCHMARK_SUITE_BASE_DIR environment variable is not defined"
 fi
 
-if [[ ! -d "$BENCHMARK_BASE_DIR" ]]; then
-    fatal "BENCHMARK_BASE_DIR directory does not exist"
+if [[ ! -d "$BENCHMARK_SUITE_BASE_DIR" ]]; then
+    fatal "BENCHMARK_SUITE_BASE_DIR directory does not exist"
 fi
 
 # Check benchmark specification
-export BENCHMARK_SPEC="$1"
-if [[ "x$BENCHMARK_SPEC" == "x" ]]; then
+export BENCHMARK_SUITE_RUNNER_SPEC="$1"
+if [[ "x$BENCHMARK_SUITE_RUNNER_SPEC" == "x" ]]; then
     fatal "Benchmarks are not specified in the command line"
 fi
 
-# Save benchmark description
-export BENCHMARK_DESCRIPTION="$2"
+# Create result directory
+if [[ "x$BENCHMARK_SUITE_RUNNER_RESULT_DIR" == "x" ]]; then
+    BENCHMARK_SUITE_RUNNER_RESULT_DIR_PREFIX="$2"
+    if [[ "x$BENCHMARK_SUITE_RUNNER_RESULT_DIR_PREFIX" == "x" ]]; then
+        BENCHMARK_SUITE_RUNNER_RESULT_DIR_PREFIX="run"
+    fi
 
-# Check result directory
-if [[ "x$BENCHMARK_SUITE_RESULTS" == "x" ]]; then
-    BENCHMARK_SUITE_RESULT_DIRNAME="$BENCHMARK_SUITE_DIR/results/run-$(date -d @$BENCHMARK_SUITE_STARTED_AT '+%Y%m%d%H%M%S')"
-    export BENCHMARK_SUITE_RESULTS="$(realpath -m $BENCHMARK_SUITE_RESULT_DIRNAME)"
-    mkdir -p "$BENCHMARK_SUITE_RESULTS"
+    BENCHMARK_SUITE_RUNNER_RESULT_DIRNAME="$BENCHMARK_SUITE_RUNNER_DIR/results/$BENCHMARK_SUITE_RUNNER_RESULT_DIR_PREFIX-$(date -d @$BENCHMARK_SUITE_RUNNER_START_TIMESTAMP '+%Y%m%d%H%M%S')"
+    export BENCHMARK_SUITE_RUNNER_RESULT_DIR="$(realpath -m $BENCHMARK_SUITE_RUNNER_RESULT_DIRNAME)"
+    mkdir -p "$BENCHMARK_SUITE_RUNNER_RESULT_DIR"
 
-    export BENCHMARK_LATEST_RESULTS="$BENCHMARK_SUITE_DIR/results/latest"
-    rm -f "$BENCHMARK_LATEST_RESULTS"
-    ln -s "$(realpath -m --relative-to=$BENCHMARK_SUITE_DIR/results $BENCHMARK_SUITE_RESULT_DIRNAME)" "$BENCHMARK_LATEST_RESULTS"
-elif [[ -d "$BENCHMARK_SUITE_RESULTS" ]]; then
-    fatal "BENCHMARK_SUITE_RESULTS already exists"
+    export BENCHMARK_LATEST_RESULTS_DIR="$BENCHMARK_SUITE_RUNNER_DIR/results/latest"
+    rm -f "$BENCHMARK_LATEST_RESULTS_DIR"
+    ln -s "$(realpath -m --relative-to=$BENCHMARK_SUITE_RUNNER_DIR/results $BENCHMARK_SUITE_RUNNER_RESULT_DIRNAME)" "$BENCHMARK_LATEST_RESULTS_DIR"
+elif [[ -d "$BENCHMARK_SUITE_RUNNER_RESULT_DIR" ]]; then
+    fatal "BENCHMARK_SUITE_RUNNER_RESULT_DIR already exists"
 fi
 
 # Check Java options
@@ -47,15 +51,15 @@ if [[ "x$JAVA_OPTIONS" == "x" ]]; then
 fi
 
 # Report configuration
-info "Benchmark suite started at $BENCHMARK_SUITE_STARTED_AT"
-info "Benchmark suite configured with benchmarks: $BENCHMARK_SPEC"
+info "Benchmark suite started at $BENCHMARK_SUITE_RUNNER_START_TIMESTAMP"
+info "Benchmark suite configured with benchmarks: $BENCHMARK_SUITE_RUNNER_SPEC"
 info "Benchmark suite configured with JAVA_HOME=$JAVA_HOME"
 info "Benchmark suite configured with JAVA_OPTIONS=$JAVA_OPTIONS"
-info "Benchmark suite configured with BENCHMARK_BASE_DIR=$BENCHMARK_BASE_DIR"
-info "Benchmark suite configured with BENCHMARK_SUITE_RESULTS=$BENCHMARK_SUITE_RESULTS"
-info "Benchmark description: $BENCHMARK_DESCRIPTION"
+info "Benchmark suite configured with BENCHMARK_SUITE_BASE_DIR=$BENCHMARK_SUITE_BASE_DIR"
+info "Benchmark suite configured with BENCHMARK_SUITE_RUNNER_RESULT_DIR=$BENCHMARK_SUITE_RUNNER_RESULT_DIR"
+info "Benchmark notes: $BENCHMARK_SUITE_RUNNER_NOTES"
 
-# Initialize
+# Initialize environment
 export _JAVA_HOME="$JAVA_HOME"
 export _JAVA_OPTIONS="$JAVA_OPTIONS"
 export PATH="$JAVA_HOME/bin:$PATH"
