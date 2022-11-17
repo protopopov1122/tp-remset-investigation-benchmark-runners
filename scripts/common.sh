@@ -6,10 +6,10 @@ ANSI_COLOR_GREEN_FG="\e[32m"
 ANSI_COLOR_YELLOW_FG="\e[33m"
 ANSI_COLOR_GRAY_FG="\e[90m"
 
-export CURRENT_SCRIPT_NAME="$(basename $0)"
+CURRENT_SCRIPT_NAME="$(basename $0)"
 
 if [[ "x$LOG_ENABLE_COLORS" == "x" ]]; then
-    export LOG_ENABLE_COLORS="yes"
+    LOG_ENABLE_COLORS="yes"
 fi
 
 log () {
