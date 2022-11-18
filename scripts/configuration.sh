@@ -10,6 +10,8 @@ load_java_home_configuration () {
     fi
 
     export _JAVA_HOME="$JAVA_HOME"
+    export JAVA="$JAVA_HOME"
+    export _JAVA="$JAVA_HOME"
     export PATH="$JAVA_HOME/bin:$PATH"
 }
 

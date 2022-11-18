@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+set -e
+set -o pipefail
+
 source "$BENCHMARK_SUITE_RUNNER_DIR/scripts/common.sh"
 
 TMPFILE="$BENCHMARK_TMPDIR/output.log"
