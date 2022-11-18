@@ -39,6 +39,7 @@ load_java_options () {
     fi
 
     export _JAVA_OPTIONS="$JAVA_OPTIONS"
+    export JAVA_OPTS="$JAVA_OPTIONS"
 }
 
 load_benchmark_suite_runner_output_configuration () {
@@ -99,8 +100,7 @@ initialize_runners () {
     mkdir -p "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR"
     cat /proc/cpuinfo > "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/cpuinfo.log"
     cat /proc/meminfo > "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/meminfo.log"
-    echo "JAVA_HOME=\"$JAVA_HOME\"" > "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/java.log"
-    echo "JAVA_OPTIONS=\"$JAVA_OPTIONS\"" >> "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/java.log"
+    export > "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/environment.log"
     echo "$BENCHMARK_SUITE_RUNNER_START_TIMESTAMP" > "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/timestamps.log"
     echo "$BENCHMARK_SUITE_RUNNER_SPEC" > "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/runner_spec.log"
     echo "$BENCHMARK_SUITE_RUNNER_NOTES" > "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/notes.txt"
