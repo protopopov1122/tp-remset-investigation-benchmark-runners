@@ -10,6 +10,8 @@ RESULTS="$BENCHMARK_RESULT_DIR/results"
 RESULTS_CSV="$BENCHMARK_RESULT_DIR/results.csv"
 SPECJVM2008="$BENCHMARK_SUITE_BASE_DIR/specjvm2008"
 
+export JAVA_OPTS="$JAVA_OPTS --add-exports=java.xml/jdk.xml.internal=ALL-UNNAMED"
+
 cd "$SPECJVM2008"
 rm -rf results
 sh ./run-specjvm.sh -ikv -ict \
@@ -26,4 +28,4 @@ sh ./run-specjvm.sh -ikv -ict \
 cp -r "$SPECJVM2008/results" "$RESULTS"
 
 echo "Benchmark,ops/m" > "$RESULTS_CSV"
-cat "$TMPFILE" | sed -nr "s/Score\s+on\s+([a-zA-Z0-9\.]*):\s*([0-9]+([,\.][0-9]+)?)\s*ops\/m/\1,\2.\4" >> "$RESULTS_CSV"
+cat "$TMPFILE" | sed -nr "s/Score\s+on\s+([a-zA-Z0-9\.]*):\s*([0-9]+(\.[0-9]+)?)\s*ops\/m/\1,\2/p" >> "$RESULTS_CSV"

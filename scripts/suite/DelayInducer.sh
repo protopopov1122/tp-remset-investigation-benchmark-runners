@@ -8,9 +8,9 @@ source "$BENCHMARK_SUITE_RUNNER_DIR/scripts/common.sh"
 BINDIR="$BENCHMARK_TMPDIR/bin"
 TMPFILE="$BENCHMARK_TMPDIR/output.log"
 RESULTS="$BENCHMARK_RESULT_DIR/results.csv"
-RUNS=10
+RUNS=50
 
-"$KAVA_HOME/bin/javac" -d "$BINDIR" "$BENCHMARK_SUITE_BASE_DIR/DelayInducer.java"
+"$JAVA_HOME/bin/javac" -d "$BINDIR" "$BENCHMARK_SUITE_BASE_DIR/DelayInducer.java"
 
 echo "Wall clock time (ms)" > "$RESULTS"
 

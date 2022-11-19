@@ -1,4 +1,5 @@
 export BENCHMARK_SUITE_RUNNER_SCRIPT_DIR="$BENCHMARK_SUITE_RUNNER_DIR/scripts/suite"
+export BENCHMARK_SUITE_RUNNER_RESOURCES_DIR="$BENCHMARK_SUITE_RUNNER_DIR/scripts/resources"
 declare -A BENCHMARK_SUITE_RUNNER=()
 declare -A BENCHMARK_RUNNER_PARAMETERS=()
 
@@ -52,8 +53,9 @@ execute_benchmark_suite () {
         local benchmark_script="${BENCHMARK_SUITE_RUNNER[$benchmark_name]}"
 
         export BENCHMARK_NAME="$benchmark_name"
-        export BENCHMARK_RESULT_DIR="$BENCHMARK_SUITE_RUNNER_OUTPUT_DIR/benchmarks/$benchmark_name"
-        export BENCHMARK_TMPDIR="$BENCHMARK_SUITE_RUNNER_OUTPUT_DIR/tmp"
+        export BENCHMARK_RESULT_DIR="$(realpath -m $BENCHMARK_SUITE_RUNNER_OUTPUT_DIR/benchmarks/$benchmark_name)"
+        export BENCHMARK_TMPDIR="$(realpath -m $BENCHMARK_SUITE_RUNNER_OUTPUT_DIR/tmp)"
+        export BENCHMARK_RESOURCES="$(realpath -m $BENCHMARK_SUITE_RUNNER_RESOURCES_DIR/$benchmark_name)"
         local benchmark_output="$BENCHMARK_RESULT_DIR/output.log"
         local benchmark_timestamps="$BENCHMARK_RESULT_DIR/timestamps.log"
 

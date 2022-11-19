@@ -8,9 +8,9 @@ source "$BENCHMARK_SUITE_RUNNER_DIR/scripts/common.sh"
 TMPFILE="$BENCHMARK_TMPDIR/output.log"
 RESULTS="$BENCHMARK_RESULT_DIR/results.csv"
 PHYSICAL_CORES="$(lscpu --parse='core' | grep -v '#' | sort | uniq | wc -l)"
-SHORT_RUNS=6
-MEDIUM_RUNS=3
-LONG_RUNS=2
+SHORT_RUNS=20
+MEDIUM_RUNS=10
+LONG_RUNS=5
 
 info "Detected $PHYSICAL_CORES physical CPU cores on the machine"
 
