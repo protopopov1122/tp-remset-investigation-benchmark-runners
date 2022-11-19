@@ -68,7 +68,7 @@ execute_benchmark_suite () {
         info "\tTimestamps stored in $benchmark_timestamps"
         date "+%s" > "$benchmark_timestamps"
 
-        "$benchmark_script" "$benchmark_params" 2>&1 | tee "$benchmark_output"
+        (set -o pipefail; "$benchmark_script" "$benchmark_params" 2>&1 | tee "$benchmark_output")
         local exit_code="$?"
 
         date "+%s" >> "$benchmark_timestamps"
@@ -77,6 +77,7 @@ execute_benchmark_suite () {
             info "Benchmark $benchmark_name has finished successfully"
         else
             warn "Benchmark $benchmark_name has failed with exit code $exit_code"
+            touch "$BENCHMARK_RESULT_DIR/failed"
         fi
 
         rm -rf "$BENCHMARK_TMPDIR"

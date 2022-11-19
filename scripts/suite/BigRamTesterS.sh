@@ -18,5 +18,8 @@ cd "$BINDIR"
 
 info "Executing $RUNS test run(s)"
 for i in $(seq $RUNS); do
-    "$JAVA_HOME/bin/java" -Xmx8G -Xms8G -Xlog:async -Xlog:gc=debug,gc+start=debug,gc+phases*=debug,gc+heap=debug:"$RESULTS/$i.log" BigRamTesterS
+    export JAVA_OPTIONS="$JAVA_OPTIONS -Xmx8G -Xms8G"
+    export _JAVA_OPTIONS="$_JAVA_OPTIONS -Xmx8G -Xms8G"
+    export JAVA_OPTS="$JAVA_OPTS -Xmx8G -Xms8G"
+    "$JAVA_HOME/bin/java" -Xlog:async -Xlog:gc=debug,gc+start=debug,gc+phases*=debug,gc+heap=debug:"$RESULTS/$i.log" BigRamTesterS
 done

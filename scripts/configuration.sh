@@ -102,7 +102,7 @@ initialize_runners () {
     cat /proc/meminfo > "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/meminfo.log"
     cat /etc/issue > "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/platform.log"
     uname -a >> "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/platform.log"
-    export > "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/environment.log"
+    export | grep "JAVA\|BENCHMARK" > "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/environment.log"
     echo "$BENCHMARK_SUITE_RUNNER_START_TIMESTAMP" > "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/timestamps.log"
     echo "$BENCHMARK_SUITE_RUNNER_SPEC" > "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/runner_spec.log"
     echo "$BENCHMARK_SUITE_RUNNER_NOTES" > "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/notes.txt"
