@@ -20,4 +20,4 @@ tar -xf downloads/apache-maven-3.8.6-bin.tar.gz -C ./maven/
 cp "$BENCHMARK_SUITE_BASE_DIR/optaplanner/optaplanner.sh" .
 ./optaplanner.sh
 
-cp -r "$BENCHMARK_SUITE_BASE_DIR/results" "$BENCHMARK_RESULT_DIR/results"
+cp -r "$BENCHMARK_TMPDIR/results" "$BENCHMARK_RESULT_DIR"

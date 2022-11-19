@@ -100,6 +100,8 @@ initialize_runners () {
     mkdir -p "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR"
     cat /proc/cpuinfo > "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/cpuinfo.log"
     cat /proc/meminfo > "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/meminfo.log"
+    cat /etc/issue > "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/platform.log"
+    uname -a >> "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/platform.log"
     export > "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/environment.log"
     echo "$BENCHMARK_SUITE_RUNNER_START_TIMESTAMP" > "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/timestamps.log"
     echo "$BENCHMARK_SUITE_RUNNER_SPEC" > "$BENCHMARK_SUITE_RUNNER_CONFIG_DIR/runner_spec.log"

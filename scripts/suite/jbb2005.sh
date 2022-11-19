@@ -23,4 +23,4 @@ cp -r "$JBB2005/results" "$BENCHMARK_RESULT_DIR"
 
 cat "$TMPFILE" | sed -nr 's/TOTALS\s+FOR:\s*COMPANY\s+with\s+([0-9]+)\s*warehouses/\1/p' > "$TMPFILE2"
 cat "$TMPFILE" | sed -nr 's/.*throughput\s*=\s*([0-9]+(\.[0-9]+)?)\s*SPECjbb2005\s+bops.*/\1/p' > "$TMPFILE3"
-(echo "warehouses,throughput"; paste -d, tmp1 tmp2 | tr -d ' ') > "$RESULTS_CSV"
+(echo "warehouses,throughput"; paste -d, "$TMPFILE2" "$TMPFILE3" | tr -d ' ') > "$RESULTS_CSV"
