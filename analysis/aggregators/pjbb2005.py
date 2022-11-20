@@ -28,19 +28,20 @@ class pjbb2005Aggregator(ResultAggregator, ResultExporter):
         writer = csv.writer(destination)
         if not throughputs:
             writer.writerow(['Avg. time', 'Count', 'Min. time', 'Max. time'])
+            time_result = result['time']
             writer.writerow([
-                round(result['time']['avg'], 3),
-                result['time']['count'],
-                round(result['time']['min'], 3),
-                round(result['time']['max'], 3)])
+                round(time_result.average, 3),
+                time_result.sample_count,
+                round(time_result.minimum, 3),
+                round(time_result.maximum, 3)])
         else:
             writer.writerow(['Warehouses', 'Avg. score', 'Count', 'Min. score', 'Max. score'])
             for warehouses, throughput in result['throughputs'].items():
                 writer.writerow([warehouses,
-                    round(throughput['avg'], 3),
-                    throughput['count'],
-                    round(throughput['min'], 3),
-                    round(throughput['max'], 3)])
+                    round(throughput.average, 3),
+                    throughput.sample_count,
+                    round(throughput.minimum, 3),
+                    round(throughput.maximum, 3)])
     
     def _update_result(self, warehouses, result):
         if warehouses not in self._throughputs:

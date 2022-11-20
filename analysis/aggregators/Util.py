@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from collections import namedtuple
 
 class ResultAggregator(ABC):
     @abstractmethod
@@ -61,6 +62,13 @@ class MaxAggregator(ResultAggregator):
     def get_result(self):
         return self._value
 
+NumericAggregation = namedtuple('NumericAggregation', [
+    'average',
+    'sample_count',
+    'maximum',
+    'minimum'
+])
+
 class NumericAggregator(ResultAggregator):
     def __init__(self):
         super().__init__()
@@ -73,10 +81,10 @@ class NumericAggregator(ResultAggregator):
         self._min.update(arg)
         self._max.update(arg)
 
-    def get_result(self):
-        return {
-            'avg': self._avg.get_result(),
-            'count': self._avg.get_count(),
-            'min': self._min.get_result(),
-            'max': self._max.get_result()
-        }
+    def get_result(self) -> NumericAggregation:
+        return NumericAggregation(
+            average=self._avg.get_result(),
+            sample_count=self._avg.get_count(),
+            minimum=self._min.get_result(),
+            maximum=self._max.get_result()
+        )

@@ -22,12 +22,12 @@ class CompilerSpeedAggregator(ResultAggregator, ResultExporter):
         result = self.get_result()
         writer = csv.writer(destination)
         writer.writerow(['Duration', 'Average', 'Count', 'Minimum', 'Maximum'])
-        for duration, dur_results in result.items():
+        for duration, ops_per_sec in result.items():
             writer.writerow([duration,
-                round(dur_results['avg'], 3),
-                dur_results['count'],
-                round(dur_results['min'], 3),
-                round(dur_results['max'], 3)])
+                round(ops_per_sec.average, 3),
+                ops_per_sec.sample_count,
+                round(ops_per_sec.minimum, 3),
+                round(ops_per_sec.maximum, 3)])
 
     
     def _update_result(self, duration, measurement):

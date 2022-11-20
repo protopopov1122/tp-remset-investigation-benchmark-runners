@@ -11,14 +11,14 @@ class DelayInducerAggregator(ResultAggregator, ResultExporter):
             self._result.update(measurement)
 
     def export_result(self, destination):
-        result = self.get_result()
+        delay = self.get_result()
         writer = csv.writer(destination)
         writer.writerow(['Average', 'Count', 'Minimum', 'Maximum'])
         writer.writerow([
-            round(result['avg'], 3),
-            result['count'],
-            round(result['min'], 3),
-            round(result['max'], 3)])
+            round(delay.average, 3),
+            delay.sample_count,
+            round(delay.minimum, 3),
+            round(delay.maximum, 3)])
     
     def get_result(self):
         return self._result.get_result()

@@ -22,10 +22,10 @@ class SPECjbb2005Aggregator(ResultAggregator, ResultExporter):
         writer.writerow(['Warehouses', 'Avg. score', 'Count', 'Min. score', 'Max. score'])
         for warehouses, throughput in result.items():
             writer.writerow([warehouses,
-                round(throughput['avg'], 3),
-                throughput['count'],
-                round(throughput['min'], 3),
-                round(throughput['max'], 3)])
+                round(throughput.average, 3),
+                throughput.sample_count,
+                round(throughput.minimum, 3),
+                round(throughput.maximum, 3)])
     
     def _update_result(self, warehouses, result):
         if warehouses not in self._result:
