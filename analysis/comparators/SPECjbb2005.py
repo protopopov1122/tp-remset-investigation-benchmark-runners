@@ -32,6 +32,6 @@ class SPECjbb2005Comparator(ResultAggregator, ResultExporter):
             for warehouses, msec_comparison in msec_comparisons.items():
                 delta = msec_comparison['delta']
                 writer.writerow([index, warehouses,
-                    round(msec_comparison['value'].average, 3),
-                    round(delta.absolute_delta, 3),
-                    round(delta.relative_delta, 3)])
+                    round(msec_comparison['value'].average, ResultExporter.get_rounding()),
+                    round(delta.absolute_delta, ResultExporter.get_rounding()),
+                    round(delta.relative_delta, ResultExporter.get_rounding())])

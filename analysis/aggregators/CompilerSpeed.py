@@ -24,10 +24,10 @@ class CompilerSpeedAggregator(ResultAggregator, ResultExporter):
         writer.writerow(['Duration', 'Average', 'Count', 'Minimum', 'Maximum'])
         for duration, ops_per_sec in result.items():
             writer.writerow([duration,
-                round(ops_per_sec.average, 3),
+                round(ops_per_sec.average, ResultExporter.get_rounding()),
                 ops_per_sec.sample_count,
-                round(ops_per_sec.minimum, 3),
-                round(ops_per_sec.maximum, 3)])
+                round(ops_per_sec.minimum, ResultExporter.get_rounding()),
+                round(ops_per_sec.maximum, ResultExporter.get_rounding())])
 
     
     def _update_result(self, duration, measurement):

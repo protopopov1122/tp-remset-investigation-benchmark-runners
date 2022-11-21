@@ -32,6 +32,6 @@ class CompilerSpeedComparator(ResultAggregator, ResultExporter):
             for duration, ops_comparison in comparison.items():
                 delta = ops_comparison['delta']
                 writer.writerow([index, duration,
-                    round(ops_comparison['value'].average, 3),
-                    round(delta.absolute_delta, 3),
-                    round(delta.relative_delta, 3)])
+                    round(ops_comparison['value'].average, ResultExporter.get_rounding()),
+                    round(delta.absolute_delta, ResultExporter.get_rounding()),
+                    round(delta.relative_delta, ResultExporter.get_rounding())])

@@ -45,15 +45,15 @@ class pjbb2005Comparator(ResultAggregator, ResultExporter):
                     throughput_delta = throughput['delta']
                     writer.writerow([index,
                         warehouses,
-                        round(throughput['value'].average, 3),
-                        round(throughput_delta.absolute_delta, 3),
-                        round(throughput_delta.relative_delta, 3) if throughput_delta.relative_delta is not None else ''])
+                        round(throughput['value'].average, ResultExporter.get_rounding()),
+                        round(throughput_delta.absolute_delta, ResultExporter.get_rounding()),
+                        round(throughput_delta.relative_delta, ResultExporter.get_rounding()) if throughput_delta.relative_delta is not None else ''])
         else:
             time_comparisons = result['time']
             writer.writerow(['Run', 'Average', 'Absolute change', 'Relative change'])
             for index, time_comparison in enumerate(time_comparisons):
                 time_delta = time_comparison['delta']
                 writer.writerow([index,
-                    round(time_comparison['value'].average, 3),
-                    round(time_delta.absolute_delta, 3),
-                    round(time_delta.relative_delta, 3)])
+                    round(time_comparison['value'].average, ResultExporter.get_rounding()),
+                    round(time_delta.absolute_delta, ResultExporter.get_rounding()),
+                    round(time_delta.relative_delta, ResultExporter.get_rounding())])

@@ -23,10 +23,10 @@ class OptaplannerAggregator(ResultAggregator, ResultExporter):
         writer.writerow(['GC', 'Solver ID', 'Avg. score', 'Count', 'Min. score', 'Max. score'])
         for (gc, solverId), score in result.items():
             writer.writerow([gc, solverId,
-                round(score.average, 3),
+                round(score.average, ResultExporter.get_rounding()),
                 score.sample_count,
-                round(score.minimum, 3),
-                round(score.maximum, 3)])
+                round(score.minimum, ResultExporter.get_rounding()),
+                round(score.maximum, ResultExporter.get_rounding())])
 
     
     def _update_result(self, key, score):

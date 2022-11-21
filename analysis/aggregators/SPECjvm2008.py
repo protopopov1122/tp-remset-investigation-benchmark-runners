@@ -22,10 +22,10 @@ class SPECjvm2008Aggregator(ResultAggregator, ResultExporter):
         writer.writerow(['Benchmark', 'Avg. score', 'Count', 'Min. score', 'Max. score'])
         for name, score in result.items():
             writer.writerow([name,
-                round(score.average, 3),
+                round(score.average, ResultExporter.get_rounding()),
                 score.sample_count,
-                round(score.minimum, 3),
-                round(score.maximum, 3)])
+                round(score.minimum, ResultExporter.get_rounding()),
+                round(score.maximum, ResultExporter.get_rounding())])
     
     def _update_result(self, name, result):
         if name not in self._result:

@@ -1,3 +1,4 @@
+import os
 from abc import ABC, abstractmethod
 from collections import namedtuple
 
@@ -11,6 +12,13 @@ class ResultAggregator(ABC):
 class ResultExporter(ABC):
     @abstractmethod
     def export_result(self, destination): pass
+
+    def get_rounding(default_rounding=5) -> int:
+        round = os.getenv('ANALYSIS_EXPORT_ROUND')
+        if round:
+            return int(round)
+        else:
+            return default_rounding
 
 class AverageAggregator(ResultAggregator):
     def __init__(self):

@@ -15,10 +15,10 @@ class DelayInducerAggregator(ResultAggregator, ResultExporter):
         writer = csv.writer(destination)
         writer.writerow(['Average', 'Count', 'Minimum', 'Maximum'])
         writer.writerow([
-            round(delay.average, 3),
+            round(delay.average, ResultExporter.get_rounding()),
             delay.sample_count,
-            round(delay.minimum, 3),
-            round(delay.maximum, 3)])
+            round(delay.minimum, ResultExporter.get_rounding()),
+            round(delay.maximum, ResultExporter.get_rounding())])
     
     def get_result(self):
         return self._result.get_result()

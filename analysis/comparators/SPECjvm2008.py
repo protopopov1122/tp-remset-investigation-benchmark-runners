@@ -32,6 +32,6 @@ class SPECjvm2008Comparator(ResultAggregator, ResultExporter):
             for name, score_comparison in comparison.items():
                 delta = score_comparison['delta']
                 writer.writerow([index, name,
-                    round(score_comparison['value'].average, 3),
-                    round(delta.absolute_delta, 3),
-                    round(delta.relative_delta, 3)])
+                    round(score_comparison['value'].average, ResultExporter.get_rounding()),
+                    round(delta.absolute_delta, ResultExporter.get_rounding()),
+                    round(delta.relative_delta, ResultExporter.get_rounding())])
