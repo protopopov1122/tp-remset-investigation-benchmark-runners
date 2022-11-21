@@ -8,8 +8,9 @@ from aggregators.Suite import BenchmarkSuiteAggregator
 from comparators.Suite import BenchmarkSuiteComparator
 
 def run_comparison(argv: List[str]):
+    export_path = argv[0]
     separator_index = argv.index('--')
-    baseline_suites = [BenchmarkSuite(Path(arg)) for arg in argv[:separator_index]]
+    baseline_suites = [BenchmarkSuite(Path(arg)) for arg in argv[1:separator_index]]
     comparison_suites = [BenchmarkSuite(Path(arg)) for arg in argv[separator_index + 1:]]
     baseline_aggregator = BenchmarkSuiteAggregator()
     comparison_aggregator = BenchmarkSuiteAggregator()
@@ -19,7 +20,7 @@ def run_comparison(argv: List[str]):
         comparison_aggregator.update(suite)
     comparator = BenchmarkSuiteComparator(baseline_aggregator.get_result())
     comparator.update(comparison_aggregator.get_result())
-    print(comparator.get_result())
+    comparator.export_result(export_path)
 
 if __name__ == '__main__':
     try:

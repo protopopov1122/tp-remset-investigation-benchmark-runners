@@ -1,4 +1,6 @@
-from aggregators.Util import ResultAggregator
+import zipfile
+import io
+from aggregators.Util import ResultAggregator, ResultExporter
 from comparators.CompilerSpeed import CompilerSpeedComparator
 from comparators.DelayInducer import DelayInducerComparator
 from comparators.DaCapo import DaCapoComparator
@@ -8,7 +10,7 @@ from comparators.Renaissance import RenaissanceComparator
 from comparators.SPECjbb2005 import SPECjbb2005Comparator
 from comparators.SPECjvm2008 import SPECjvm2008Comparator
 
-class BenchmarkSuiteComparator(ResultAggregator):
+class BenchmarkSuiteComparator(ResultAggregator, ResultExporter):
     def __init__(self, baseline) -> None:
         super().__init__()
         self._baseline = baseline
@@ -42,3 +44,20 @@ class BenchmarkSuiteComparator(ResultAggregator):
             'SPECjbb2005': self._specjbb2005.get_result(),
             'SPECjvm2008': self._specjvm2008.get_result()
         }
+
+    def export_result(self, destination):
+        with zipfile.ZipFile(destination, 'w') as archive:
+            self._do_export(self._compiler_speed, archive, 'CompilerSpeed.csv')
+            self._do_export(self._dacapo, archive, 'DaCapo.csv')
+            self._do_export(self._delay_inducer, archive, 'DelayInducer.csv')
+            self._do_export(self._optaplanner, archive, 'Optaplanner.csv')
+            self._do_export(self._pjbb2005, archive, 'pjbb_1.csv', False)
+            self._do_export(self._pjbb2005, archive, 'pjbb_2.csv', True)
+            self._do_export(self._renaissance, archive, 'Renaissance.csv')
+            self._do_export(self._specjbb2005, archive, 'SPECjbb2005.csv')
+            self._do_export(self._specjvm2008, archive, 'SPECjvm2008.csv')
+
+    def _do_export(self, exporter: ResultExporter, archive: zipfile.ZipFile, filename: str, *args):
+        content = io.StringIO()
+        exporter.export_result(content, *args)
+        archive.writestr(filename, content.getvalue())

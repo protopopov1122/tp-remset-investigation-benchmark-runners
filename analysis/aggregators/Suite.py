@@ -1,4 +1,5 @@
-from pathlib import Path
+import io
+import zipfile
 from aggregators.Util import ResultAggregator, ResultExporter
 from benchmarks.Suite import BenchmarkSuite
 from aggregators.CompilerSpeed import CompilerSpeedAggregator
@@ -44,20 +45,19 @@ class BenchmarkSuiteAggregator(ResultAggregator, ResultExporter):
             'Optaplanner': self._optaplanner.get_result()
         }
 
-    def export_result(self, destination: Path):
-        if destination.exists():
-            raise RuntimeError(f'Export destination {destination} already exists')
-        destination.mkdir()
-        self._do_export(destination, 'CompilerSpeed.csv', self._compiler_speed)
-        self._do_export(destination, 'DelayInducer.csv', self._delay_inducer)
-        self._do_export(destination, 'DaCapo.csv', self._dacapo)
-        self._do_export(destination, 'Renaissance.csv', self._renaissance)
-        self._do_export(destination, 'SPECjvm2008.csv', self._specjvm)
-        self._do_export(destination, 'SPECjbb2005.csv', self._jbb2005)
-        self._do_export(destination, 'pjbb2005_time.csv', self._pjbb2005, False)
-        self._do_export(destination, 'pjbb2005_throughput.csv', self._pjbb2005, True)
-        self._do_export(destination, 'Optaplanner.csv', self._optaplanner)
+    def export_result(self, destination):
+        with zipfile.ZipFile(destination, 'w') as archive:
+            self._do_export(archive, 'CompilerSpeed.csv', self._compiler_speed)
+            self._do_export(archive, 'DelayInducer.csv', self._delay_inducer)
+            self._do_export(archive, 'DaCapo.csv', self._dacapo)
+            self._do_export(archive, 'Renaissance.csv', self._renaissance)
+            self._do_export(archive, 'SPECjvm2008.csv', self._specjvm)
+            self._do_export(archive, 'SPECjbb2005.csv', self._jbb2005)
+            self._do_export(archive, 'pjbb2005_time.csv', self._pjbb2005, False)
+            self._do_export(archive, 'pjbb2005_throughput.csv', self._pjbb2005, True)
+            self._do_export(archive, 'Optaplanner.csv', self._optaplanner)
 
-    def _do_export(self, destination: Path, name: str, exporter: ResultExporter, *extra_args):
-        with destination.joinpath(name).open('w') as output:
-            exporter.export_result(output, *extra_args)
+    def _do_export(self, archive: zipfile.ZipFile, name: str, exporter: ResultExporter, *extra_args):
+        content = io.StringIO()
+        exporter.export_result(content, *extra_args)
+        archive.writestr(name, content.getvalue())
