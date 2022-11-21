@@ -20,7 +20,7 @@ $JAVA_HOME/bin/java \
     $(java_gc_log_flags $GC_LOGS/gc.log) \
     -cp "$JBB2005/jbb.jar:$JBB2005/check.jar" \
     spec.jbb.JBBmain \
-    -propfile "$BENCHMARK_RESOURCES/SPECjbb.props" | tee "$TMPFILE"
+    -propfile "$JBB2005/SPECjbb_custom.props" | tee "$TMPFILE"
 
 cp -r "$JBB2005/results" "$BENCHMARK_RESULT_DIR"
 

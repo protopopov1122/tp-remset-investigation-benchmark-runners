@@ -55,7 +55,6 @@ execute_benchmark_suite () {
         export BENCHMARK_NAME="$benchmark_name"
         export BENCHMARK_RESULT_DIR="$(realpath -m $BENCHMARK_SUITE_RUNNER_OUTPUT_DIR/benchmarks/$benchmark_name)"
         export BENCHMARK_TMPDIR="$(realpath -m $BENCHMARK_SUITE_RUNNER_OUTPUT_DIR/tmp)"
-        export BENCHMARK_RESOURCES="$(realpath -m $BENCHMARK_SUITE_RUNNER_RESOURCES_DIR/$benchmark_name)"
         local benchmark_output="$BENCHMARK_RESULT_DIR/output.log"
         local benchmark_timestamps="$BENCHMARK_RESULT_DIR/timestamps.log"
 

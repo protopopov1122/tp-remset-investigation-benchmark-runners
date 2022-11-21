@@ -20,7 +20,7 @@ $JAVA_HOME/bin/java \
     $(java_gc_log_flags $GC_LOGS/gc.log) \
     -cp "$PJBB2005/jbb.jar:$PJBB2005/check.jar" \
     spec.jbb.JBBmain \
-    -propfile "$BENCHMARK_RESOURCES/SPECjbb.props" 2>&1 | tee "$TMPFILE"
+    -propfile "$PJBB2005/SPECjbb_custom.props" 2>&1 | tee "$TMPFILE"
 
 echo "Operation,msec" > "$RESULTS1"
 cat "$TMPFILE" | sed -nr 's/=+\s*(pjbb2005)\s*PASSED\s*in\s*([0-9]+)\s*msec\s*=+/\1,\2/p' >> "$RESULTS1"
