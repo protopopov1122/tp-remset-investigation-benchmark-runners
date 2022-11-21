@@ -7,14 +7,17 @@ source "$BENCHMARK_SUITE_RUNNER_DIR/scripts/common.sh"
 
 RESULTS1="$BENCHMARK_RESULT_DIR/results1.csv"
 RESULTS2="$BENCHMARK_RESULT_DIR/results2.csv"
+GC_LOGS="$BENCHMARK_RESULT_DIR/gc_logs"
 TMPFILE="$BENCHMARK_TMPDIR/output.log"
 TMPFILE2="$BENCHMARK_TMPDIR/tmp1"
 TMPFILE3="$BENCHMARK_TMPDIR/tmp2"
 PJBB2005=""$BENCHMARK_SUITE_BASE_DIR/pjbb2005""
 
+mkdir "$GC_LOGS"
 export CLASSPATH="$PJBB2005/jbb.jar:$PJBB2005/check.jar:$CLASSPATH"
 
 $JAVA_HOME/bin/java \
+    $(java_gc_log_flags $GC_LOGS/gc.log) \
     -cp "$PJBB2005/jbb.jar:$PJBB2005/check.jar" \
     spec.jbb.JBBmain \
     -propfile "$BENCHMARK_RESOURCES/SPECjbb.props" 2>&1 | tee "$TMPFILE"

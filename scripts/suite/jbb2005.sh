@@ -6,6 +6,7 @@ set -o pipefail
 source "$BENCHMARK_SUITE_RUNNER_DIR/scripts/common.sh"
 
 RESULTS_CSV="$BENCHMARK_RESULT_DIR/results.csv"
+GC_LOGS="$BENCHMARK_RESULT_DIR/gc_logs"
 JBB2005="$BENCHMARK_SUITE_BASE_DIR/jbb2005"
 TMPFILE="$BENCHMARK_TMPDIR/output.log"
 TMPFILE2="$BENCHMARK_TMPDIR/tmp1"
@@ -13,8 +14,10 @@ TMPFILE3="$BENCHMARK_TMPDIR/tmp2"
 
 export CLASSPATH="$JBB2005/jbb.jar:$JBB2005/check.jar:$CLASSPATH"
 
+mkdir "$GC_LOGS"
 cd "$JBB2005"
 $JAVA_HOME/bin/java \
+    $(java_gc_log_flags $GC_LOGS/gc.log) \
     -cp "$JBB2005/jbb.jar:$JBB2005/check.jar" \
     spec.jbb.JBBmain \
     -propfile "$BENCHMARK_RESOURCES/SPECjbb.props" | tee "$TMPFILE"

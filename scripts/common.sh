@@ -40,3 +40,11 @@ info () {
 trace () {
     log "TRACE" "$1" "$ANSI_COLOR_GRAY_FG"
 }
+
+java_gc_log_flags () {
+    if [[ "x$GC_LOGGING" == "xdisable" ]]; then
+        echo -n ""
+    else
+        echo -n "-Xlog:async -Xlog:gc=debug,gc+start=debug,gc+phases*=debug,gc+heap=debug:$1"
+    fi
+}
