@@ -18,8 +18,5 @@ cd "$BINDIR"
 
 info "Executing $RUNS test run(s)"
 for i in $(seq $RUNS); do
-    export JAVA_OPTIONS="$JAVA_OPTIONS -Xmx8G -Xms8G"
-    export _JAVA_OPTIONS="$_JAVA_OPTIONS -Xmx8G -Xms8G"
-    export JAVA_OPTS="$JAVA_OPTS -Xmx8G -Xms8G"
-    "$JAVA_HOME/bin/java" $(java_gc_log_flags $GC_LOGS/$i.log) BigRamTesterS
+    "$JAVA_HOME/bin/java" -Xmx8G -Xms8G $(java_gc_log_flags $GC_LOGS/$i.log) BigRamTesterS
 done

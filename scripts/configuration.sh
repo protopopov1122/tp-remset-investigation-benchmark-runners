@@ -38,6 +38,11 @@ load_java_options () {
         export JAVA_OPTIONS=""
     fi
 
+    if [[ "x$JAVA_TOOL_OPTIONS" == "x" ]]; then
+        warn "JAVA_TOOL_OPTIONS environment variable is not defined. Using default options"
+        export JAVA_TOOL_OPTIONS=""
+    fi
+
     export _JAVA_OPTIONS="$JAVA_OPTIONS"
     export JAVA_OPTS="$JAVA_OPTIONS"
 }
