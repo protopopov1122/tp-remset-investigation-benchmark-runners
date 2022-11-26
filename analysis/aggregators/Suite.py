@@ -10,6 +10,7 @@ from aggregators.SPECjvm2008 import SPECjvm2008Aggregator
 from aggregators.SPECjbb2005 import SPECjbb2005Aggregator
 from aggregators.pjbb2005 import pjbb2005Aggregator
 from aggregators.Optaplanner import OptaplannerAggregator
+from aggregators.Rubykon import RubykonAggregator
 
 class BenchmarkSuiteAggregator(ResultAggregator, ResultExporter):
     def __init__(self) -> None:
@@ -22,6 +23,7 @@ class BenchmarkSuiteAggregator(ResultAggregator, ResultExporter):
         self._jbb2005 = SPECjbb2005Aggregator()
         self._pjbb2005 = pjbb2005Aggregator()
         self._optaplanner = OptaplannerAggregator()
+        self._rubykon = RubykonAggregator()
 
     def update(self, suite: BenchmarkSuite):
         self._compiler_speed.update(suite.get_compiler_speed())
@@ -32,6 +34,7 @@ class BenchmarkSuiteAggregator(ResultAggregator, ResultExporter):
         self._jbb2005.update(suite.get_specjbb2005())
         self._pjbb2005.update(suite.get_pjbb2005())
         self._optaplanner.update(suite.get_optaplanner())
+        self._rubykon.update(suite.get_rubykon())
 
     def get_result(self):
         return {
@@ -42,7 +45,8 @@ class BenchmarkSuiteAggregator(ResultAggregator, ResultExporter):
             'SPECjvm2008': self._specjvm.get_result(),
             'SPECjbb2005': self._jbb2005.get_result(),
             'pjbb2005': self._pjbb2005.get_result(),
-            'Optaplanner': self._optaplanner.get_result()
+            'Optaplanner': self._optaplanner.get_result(),
+            'Rubykon': self._rubykon.get_result()
         }
 
     def export_result(self, destination):
@@ -56,6 +60,7 @@ class BenchmarkSuiteAggregator(ResultAggregator, ResultExporter):
             self._do_export(archive, 'pjbb2005_time.csv', self._pjbb2005, False)
             self._do_export(archive, 'pjbb2005_throughput.csv', self._pjbb2005, True)
             self._do_export(archive, 'Optaplanner.csv', self._optaplanner)
+            self._do_export(archive, 'Rubykon.csv', self._rubykon)
 
     def _do_export(self, archive: zipfile.ZipFile, name: str, exporter: ResultExporter, *extra_args):
         content = io.StringIO()

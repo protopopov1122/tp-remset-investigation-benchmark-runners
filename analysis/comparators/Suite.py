@@ -9,6 +9,7 @@ from comparators.pjbb2005 import pjbb2005Comparator
 from comparators.Renaissance import RenaissanceComparator
 from comparators.SPECjbb2005 import SPECjbb2005Comparator
 from comparators.SPECjvm2008 import SPECjvm2008Comparator
+from comparators.Rubykon import RubykonComparator
 
 class BenchmarkSuiteComparator(ResultAggregator, ResultExporter):
     def __init__(self, baseline) -> None:
@@ -22,6 +23,7 @@ class BenchmarkSuiteComparator(ResultAggregator, ResultExporter):
         self._renaissance = RenaissanceComparator(self._baseline['Renaissance'])
         self._specjbb2005 = SPECjbb2005Comparator(self._baseline['SPECjbb2005'])
         self._specjvm2008 = SPECjvm2008Comparator(self._baseline['SPECjvm2008'])
+        self._rubykon = RubykonComparator(self._baseline['Rubykon'])
     
     def update(self, measurement):
         self._compiler_speed.update(measurement['CompilerSpeed'])
@@ -32,6 +34,7 @@ class BenchmarkSuiteComparator(ResultAggregator, ResultExporter):
         self._renaissance.update(measurement['Renaissance'])
         self._specjbb2005.update(measurement['SPECjbb2005'])
         self._specjvm2008.update(measurement['SPECjvm2008'])
+        self._rubykon.update(measurement['Rubykon'])
 
     def get_result(self):
         return {
@@ -42,7 +45,8 @@ class BenchmarkSuiteComparator(ResultAggregator, ResultExporter):
             'pjbb2005': self._pjbb2005.get_result(),
             'Renaissance': self._renaissance.get_result(),
             'SPECjbb2005': self._specjbb2005.get_result(),
-            'SPECjvm2008': self._specjvm2008.get_result()
+            'SPECjvm2008': self._specjvm2008.get_result(),
+            'Rubykon': self._rubykon.get_result()
         }
 
     def export_result(self, destination):
@@ -56,6 +60,7 @@ class BenchmarkSuiteComparator(ResultAggregator, ResultExporter):
             self._do_export(self._renaissance, archive, 'Renaissance.csv')
             self._do_export(self._specjbb2005, archive, 'SPECjbb2005.csv')
             self._do_export(self._specjvm2008, archive, 'SPECjvm2008.csv')
+            self._do_export(self._rubykon, archive, 'Rubykon.csv')
 
     def _do_export(self, exporter: ResultExporter, archive: zipfile.ZipFile, filename: str, *args):
         content = io.StringIO()

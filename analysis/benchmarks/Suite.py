@@ -7,6 +7,7 @@ from benchmarks.SPECjvm2008 import SPECjvm2008
 from benchmarks.SPECjbb2005 import SPECjbb2005
 from benchmarks.pjbb2005 import pjbb2005
 from benchmarks.Optaplanner import Optaplanner
+from benchmarks.Rubykon import Rubykon
 
 class BenchmarkSuite:
     def __init__(self, base_dir: Path):
@@ -21,6 +22,7 @@ class BenchmarkSuite:
         self._jbb2005 = None
         self._pjbb2005 = None
         self._optaplanner = None
+        self._rubykon = None
 
     def get_compiler_speed(self) -> CompilerSpeed:
         return self._instantiate_benchmark('_compiler_speed', CompilerSpeed)
@@ -45,6 +47,9 @@ class BenchmarkSuite:
 
     def get_optaplanner(self) -> Optaplanner:
         return self._instantiate_benchmark('_optaplanner', Optaplanner)
+
+    def get_rubykon(self) -> Rubykon:
+        return self._instantiate_benchmark('_rubykon', Rubykon)
     
     def _instantiate_benchmark(self, field_name, benchmark_class):
         if getattr(self, field_name) is None:
