@@ -10,9 +10,13 @@ GC_LOGS="$BENCHMARK_RESULT_DIR/gc_logs"
 TMPFILE="$BENCHMARK_TMPDIR/output.log"
 RUNS=5
 
-export JAVA_OPTIONS="$JAVA_OPTIONS $(java_gc_log_flags $GC_LOGS/gc.log)"
+mkdir -p "$GC_LOGS"
 
 run_rubykon () {
+    export JAVA_OPTIONS="$JAVA_OPTIONS $(java_gc_log_flags $GC_LOGS/gc.$1.log)"
+    export _JAVA_OPTIONS="$_JAVA_OPTIONS $(java_gc_log_flags $GC_LOGS/gc.$1.log)"
+    export JAVA_OPTS="$JAVA_OPTS $(java_gc_log_flags $GC_LOGS/gc.$1.log)"
+
     "$BENCHMARK_SUITE_BASE_DIR/rubykon/jruby-9.3.9.0/bin/jruby" \
         -Xcompile.invokedynamic=true \
         -J-Xms1500m \
