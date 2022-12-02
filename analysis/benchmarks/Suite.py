@@ -1,7 +1,7 @@
 from pathlib import Path
 from benchmarks.CompilerSpeed import CompilerSpeed
 from benchmarks.DelayInducer import DelayInducer
-from benchmarks.DaCapo import DaCapo
+from benchmarks.DaCapo import DaCapo, DaCapoLarge, DaCapoHuge
 from benchmarks.Renaissance import Renaissance
 from benchmarks.SPECjvm2008 import SPECjvm2008
 from benchmarks.SPECjbb2005 import SPECjbb2005
@@ -17,6 +17,8 @@ class BenchmarkSuite:
         self._compiler_speed = None
         self._delay_inducer = None
         self._dacapo = None
+        self._dacapo_large = None
+        self._dacapo_huge = None
         self._renaissance = None
         self._specjvm = None
         self._jbb2005 = None
@@ -32,6 +34,12 @@ class BenchmarkSuite:
 
     def get_dacapo(self) -> DaCapo:
         return self._instantiate_benchmark('_dacapo', DaCapo)
+
+    def get_dacapo_large(self) -> DaCapoLarge:
+        return self._instantiate_benchmark('_dacapo_large', DaCapoLarge)
+
+    def get_dacapo_huge(self) -> DaCapoHuge:
+        return self._instantiate_benchmark('_dacapo_huge', DaCapoHuge)
 
     def get_renaissance(self) -> Renaissance:
         return self._instantiate_benchmark('_renaissance', Renaissance)

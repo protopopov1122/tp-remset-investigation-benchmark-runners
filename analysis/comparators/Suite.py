@@ -18,6 +18,8 @@ class BenchmarkSuiteComparator(ResultAggregator, ResultExporter):
         self._compiler_speed = CompilerSpeedComparator(self._baseline['CompilerSpeed'])
         self._delay_inducer = DelayInducerComparator(self._baseline['DelayInducer'])
         self._dacapo = DaCapoComparator(self._baseline['DaCapo'])
+        self._dacapo_large = DaCapoComparator(self._baseline['DaCapoLarge'])
+        self._dacapo_huge = DaCapoComparator(self._baseline['DaCapoHuge'])
         self._optaplanner = OptaplannerComparator(self._baseline['Optaplanner'])
         self._pjbb2005 = pjbb2005Comparator(self._baseline['pjbb2005'])
         self._renaissance = RenaissanceComparator(self._baseline['Renaissance'])
@@ -29,6 +31,8 @@ class BenchmarkSuiteComparator(ResultAggregator, ResultExporter):
         self._compiler_speed.update(measurement['CompilerSpeed'])
         self._delay_inducer.update(measurement['DelayInducer'])
         self._dacapo.update(measurement['DaCapo'])
+        self._dacapo_large.update(measurement['DaCapoLarge'])
+        self._dacapo_huge.update(measurement['DaCapoHuge'])
         self._optaplanner.update(measurement['Optaplanner'])
         self._pjbb2005.update(measurement['pjbb2005'])
         self._renaissance.update(measurement['Renaissance'])
@@ -41,6 +45,8 @@ class BenchmarkSuiteComparator(ResultAggregator, ResultExporter):
             'CompilerSpeed': self._compiler_speed.get_result(),
             'DelayInducer': self._delay_inducer.get_result(),
             'DaCapo': self._dacapo.get_result(),
+            'DaCapoLarge': self._dacapo_large.get_result(),
+            'DaCapoHuge': self._dacapo_huge.get_result(),
             'Optaplanner': self._optaplanner.get_result(),
             'pjbb2005': self._pjbb2005.get_result(),
             'Renaissance': self._renaissance.get_result(),
@@ -53,6 +59,8 @@ class BenchmarkSuiteComparator(ResultAggregator, ResultExporter):
         with zipfile.ZipFile(destination, 'w') as archive:
             self._do_export(self._compiler_speed, archive, 'CompilerSpeed.csv')
             self._do_export(self._dacapo, archive, 'DaCapo.csv')
+            self._do_export(self._dacapo_large, archive, 'DaCapoLarge.csv')
+            self._do_export(self._dacapo_huge, archive, 'DaCapoHuge.csv')
             self._do_export(self._delay_inducer, archive, 'DelayInducer.csv')
             self._do_export(self._optaplanner, archive, 'Optaplanner.csv')
             self._do_export(self._pjbb2005, archive, 'pjbb_1.csv', False)

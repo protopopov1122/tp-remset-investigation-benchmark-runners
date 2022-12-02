@@ -1,13 +1,13 @@
 import csv
 from aggregators.Util import ResultAggregator, NumericAggregator, ResultExporter
-from benchmarks.DaCapo import DaCapo
+from benchmarks.DaCapo import DaCapoBase
 
 class DaCapoAggregator(ResultAggregator, ResultExporter):
     def __init__(self):
         super().__init__()
         self._result = dict()
 
-    def update(self, arg: DaCapo):
+    def update(self, arg: DaCapoBase):
         for name, result in arg.get_results().items():
             self._update_result(name, result)
     

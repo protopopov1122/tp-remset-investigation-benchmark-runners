@@ -18,6 +18,8 @@ class BenchmarkSuiteAggregator(ResultAggregator, ResultExporter):
         self._compiler_speed = CompilerSpeedAggregator()
         self._delay_inducer = DelayInducerAggregator()
         self._dacapo = DaCapoAggregator()
+        self._dacapo_large = DaCapoAggregator()
+        self._dacapo_huge = DaCapoAggregator()
         self._renaissance = RenaissainceAggregator()
         self._specjvm = SPECjvm2008Aggregator()
         self._jbb2005 = SPECjbb2005Aggregator()
@@ -29,6 +31,8 @@ class BenchmarkSuiteAggregator(ResultAggregator, ResultExporter):
         self._compiler_speed.update(suite.get_compiler_speed())
         self._delay_inducer.update(suite.get_delay_inducer())
         self._dacapo.update(suite.get_dacapo())
+        self._dacapo_large.update(suite.get_dacapo_large())
+        self._dacapo_huge.update(suite.get_dacapo_huge())
         self._renaissance.update(suite.get_renaissance())
         self._specjvm.update(suite.get_specjvm2008())
         self._jbb2005.update(suite.get_specjbb2005())
@@ -41,6 +45,8 @@ class BenchmarkSuiteAggregator(ResultAggregator, ResultExporter):
             'CompilerSpeed': self._compiler_speed.get_result(),
             'DelayInducer': self._delay_inducer.get_result(),
             'DaCapo': self._dacapo.get_result(),
+            'DaCapoLarge': self._dacapo_large.get_result(),
+            'DaCapoHuge': self._dacapo_huge.get_result(),
             'Renaissance': self._renaissance.get_result(),
             'SPECjvm2008': self._specjvm.get_result(),
             'SPECjbb2005': self._jbb2005.get_result(),
@@ -54,6 +60,8 @@ class BenchmarkSuiteAggregator(ResultAggregator, ResultExporter):
             self._do_export(archive, 'CompilerSpeed.csv', self._compiler_speed)
             self._do_export(archive, 'DelayInducer.csv', self._delay_inducer)
             self._do_export(archive, 'DaCapo.csv', self._dacapo)
+            self._do_export(archive, 'DaCapoLarge.csv', self._dacapo_large)
+            self._do_export(archive, 'DaCapoHuge.csv', self._dacapo_huge)
             self._do_export(archive, 'Renaissance.csv', self._renaissance)
             self._do_export(archive, 'SPECjvm2008.csv', self._specjvm)
             self._do_export(archive, 'SPECjbb2005.csv', self._jbb2005)
