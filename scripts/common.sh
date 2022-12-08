@@ -48,3 +48,9 @@ java_gc_log_flags () {
         echo -n "-Xlog:async -Xlog:gc=debug,gc+start=debug,gc+phases*=debug,gc+heap=debug:$1"
     fi
 }
+
+jfr_flags () {
+    if [[ "x$JFR_ENABLE" == "xtrue" ]]; then
+        echo -n "-XX:StartFlightRecording=dumponexit=true,filename=$1,maxsize=0"
+    fi
+}

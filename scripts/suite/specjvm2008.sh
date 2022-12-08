@@ -12,10 +12,14 @@ GC_LOGS="$BENCHMARK_RESULT_DIR/gc_logs"
 SPECJVM2008="$BENCHMARK_SUITE_BASE_DIR/specjvm2008"
 
 mkdir "$GC_LOGS"
+if [[ "x$JFR_ENABLE" == "xtrue" ]]; then
+    JFR_DIR="$BENCHMARK_RESULT_DIR/jfr"
+    mkdir -p "$JFR_DIR"
+fi
 
-export JAVA_OPTS="$JAVA_OPTS $(java_gc_log_flags $GC_LOGS/gc.log) --add-exports=java.xml/jdk.xml.internal=ALL-UNNAMED"
-export JAVA_OPTIONS="$JAVA_OPTIONS $(java_gc_log_flags $GC_LOGS/gc.log) --add-exports=java.xml/jdk.xml.internal=ALL-UNNAMED"
-export _JAVA_OPTIONS="$_JAVA_OPTIONS $(java_gc_log_flags $GC_LOGS/gc.log) --add-exports=java.xml/jdk.xml.internal=ALL-UNNAMED"
+export JAVA_OPTS="$JAVA_OPTS $(java_gc_log_flags $GC_LOGS/gc.log) $(jfr_flags $JFR_DIR) --add-exports=java.xml/jdk.xml.internal=ALL-UNNAMED"
+export JAVA_OPTIONS="$JAVA_OPTIONS $(java_gc_log_flags $GC_LOGS/gc.log) $(jfr_flags $JFR_DIR) --add-exports=java.xml/jdk.xml.internal=ALL-UNNAMED"
+export _JAVA_OPTIONS="$_JAVA_OPTIONS $(java_gc_log_flags $GC_LOGS/gc.log) $(jfr_flags $JFR_DIR) --add-exports=java.xml/jdk.xml.internal=ALL-UNNAMED"
 
 cd "$SPECJVM2008"
 rm -rf results

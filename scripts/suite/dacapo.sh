@@ -15,12 +15,17 @@ info "Running DaCapo benchmarks: $INCLUDED"
 warn "Excluded benchmarks: $EXCLUDED"
 
 mkdir "$GC_LOGS"
+if [[ "x$JFR_ENABLE" == "xtrue" ]]; then
+    JFR_DIR="$BENCHMARK_RESULT_DIR/jfr"
+    mkdir -p "$JFR_DIR"
+fi
+
 cd "$BENCHMARK_TMPDIR"
 HEAP_SIZES="-Xmx2G -Xms2G"
 export JAVA_OPTIONS="$JAVA_OPTIONS $HEAP_SIZES"
 export _JAVA_OPTIONS="$_JAVA_OPTIONS $HEAP_SIZES"
 export JAVA_OPTS="$JAVA_OPTS $HEAP_SIZES"
-$JAVA_HOME/bin/java $(java_gc_log_flags $GC_LOGS/gc.log) -jar "$BENCHMARK_SUITE_BASE_DIR/dacapo-evaluation-git+309e1fa.jar" \
+$JAVA_HOME/bin/java $(java_gc_log_flags $GC_LOGS/gc.log) $(jfr_flags $JFR_DIR) -jar "$BENCHMARK_SUITE_BASE_DIR/dacapo-evaluation-git+309e1fa.jar" \
     $INCLUDED 2>&1 | tee "$TMPFILE"
 
 echo "Benchmark,Time (msec)" > "$RESULTS"

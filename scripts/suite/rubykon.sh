@@ -11,11 +11,15 @@ TMPFILE="$BENCHMARK_TMPDIR/output.log"
 RUNS=5
 
 mkdir -p "$GC_LOGS"
+if [[ "x$JFR_ENABLE" == "xtrue" ]]; then
+    JFR_DIR="$BENCHMARK_RESULT_DIR/jfr"
+    mkdir -p "$JFR_DIR"
+fi
 
 run_rubykon () {
-    export JAVA_OPTIONS="$JAVA_OPTIONS $(java_gc_log_flags $GC_LOGS/gc.$1.log)"
-    export _JAVA_OPTIONS="$_JAVA_OPTIONS $(java_gc_log_flags $GC_LOGS/gc.$1.log)"
-    export JAVA_OPTS="$JAVA_OPTS $(java_gc_log_flags $GC_LOGS/gc.$1.log)"
+    export JAVA_OPTIONS="$JAVA_OPTIONS $(java_gc_log_flags $GC_LOGS/gc.$1.log) $(jfr_flags $JFR_DIR)"
+    export _JAVA_OPTIONS="$_JAVA_OPTIONS $(java_gc_log_flags $GC_LOGS/gc.$1.log) $(jfr_flags $JFR_DIR)"
+    export JAVA_OPTS="$JAVA_OPTS $(java_gc_log_flags $GC_LOGS/gc.$1.log) $(jfr_flags $JFR_DIR)"
 
     "$BENCHMARK_SUITE_BASE_DIR/rubykon/jruby-9.3.9.0/bin/jruby" \
         -Xcompile.invokedynamic=true \

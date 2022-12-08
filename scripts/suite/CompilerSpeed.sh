@@ -16,6 +16,10 @@ LONG_RUNS=5
 info "Detected $PHYSICAL_CORES physical CPU cores on the machine"
 
 mkdir -p "$GC_LOGS"
+if [[ "x$JFR_ENABLE" == "xtrue" ]]; then
+    JFR_DIR="$BENCHMARK_RESULT_DIR/jfr"
+    mkdir -p "$JFR_DIR"
+fi
 echo "Time limit,Threads,Actual time,Compiles/Sec" > "$RESULTS"
 
 run_bench () {
@@ -24,7 +28,7 @@ run_bench () {
     local counter="$3"
 
     cd "$BENCHMARK_SUITE_BASE_DIR/CompilerSpeed"
-    java $(java_gc_log_flags $GC_LOGS/$time_limit-$cores-$i.log) -jar "dist/CompilerSpeed.jar" "$time_limit" "$cores" | tee "$TMPFILE"
+    java $(java_gc_log_flags $GC_LOGS/$time_limit-$cores-$i.log) $(jfr_flags $JFR_DIR) -jar "dist/CompilerSpeed.jar" "$time_limit" "$cores" | tee "$TMPFILE"
     local time="$(sed -nr 's/^Time:\s*([0-9]+([,\.][0-9]+)?)s.*$/\1/p' $TMPFILE | tr ',' '.')"
     local compiles="$(sed -nr 's/.*\s([0-9]+([,\.][0-9]+)?)\s*compiles\/s$/\1/p' $TMPFILE | tr ',' '.')"
 

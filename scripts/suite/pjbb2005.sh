@@ -14,10 +14,16 @@ TMPFILE3="$BENCHMARK_TMPDIR/tmp2"
 PJBB2005=""$BENCHMARK_SUITE_BASE_DIR/pjbb2005""
 
 mkdir "$GC_LOGS"
+if [[ "x$JFR_ENABLE" == "xtrue" ]]; then
+    JFR_DIR="$BENCHMARK_RESULT_DIR/jfr"
+    mkdir -p "$JFR_DIR"
+fi
+
 export CLASSPATH="$PJBB2005/jbb.jar:$PJBB2005/check.jar:$CLASSPATH"
 
 $JAVA_HOME/bin/java \
     $(java_gc_log_flags $GC_LOGS/gc.log) \
+    $(jfr_flags $JFR_DIR) \
     -cp "$PJBB2005/jbb.jar:$PJBB2005/check.jar" \
     spec.jbb.JBBmain \
     -propfile "$PJBB2005/SPECjbb_custom.props" 2>&1 | tee "$TMPFILE"
