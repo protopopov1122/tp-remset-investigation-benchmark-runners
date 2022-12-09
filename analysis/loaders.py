@@ -33,8 +33,8 @@ def load_dacapo(benchmark_runs: List[Path], name: str) -> pandas.DataFrame:
 
 def load_delay_inducer(benchmark_runs: List[Path]) -> pandas.DataFrame:
     df = load_csv_frames(benchmark_runs, 'benchmarks/DelayInducer/results.csv')
-    df['index'] = 0
-    df = df.groupby(['index']).agg(AGG_FN)
+    df['Benchmark'] = 0
+    df = df.groupby(['Benchmark']).agg(AGG_FN)
     df.columns = AGG_COLUMNS
     return df
 
@@ -50,14 +50,17 @@ def load_optaplanner(benchmark_runs: List[Path]) -> pandas.DataFrame:
     df.columns = AGG_COLUMNS
     return df
 
-def load_pjbb2005(benchmark_runs: List[Path]) -> pandas.DataFrame:
-    df1 = load_csv_frames(benchmark_runs, 'benchmarks/pjbb2005/results1.csv')
-    df2 = load_csv_frames(benchmark_runs, 'benchmarks/pjbb2005/results2.csv')
-    df1 = df1.groupby(['Operation']).agg(AGG_FN)
-    df2 = df2.groupby(['warehouses']).agg(AGG_FN)
-    df1.columns = AGG_COLUMNS
-    df2.columns = AGG_COLUMNS
-    return df1, df2
+def load_pjbb2005_msec(benchmark_runs: List[Path]) -> pandas.DataFrame:
+    df = load_csv_frames(benchmark_runs, 'benchmarks/pjbb2005/results1.csv')
+    df = df.groupby(['Operation']).agg(AGG_FN)
+    df.columns = AGG_COLUMNS
+    return df
+
+def load_pjbb2005_throughput(benchmark_runs: List[Path]) -> pandas.DataFrame:
+    df = load_csv_frames(benchmark_runs, 'benchmarks/pjbb2005/results2.csv')
+    df = df.groupby(['warehouses']).agg(AGG_FN)
+    df.columns = AGG_COLUMNS
+    return df
 
 def load_renaissance(benchmark_runs: List[Path]) -> pandas.DataFrame:
     df = load_csv_frames(benchmark_runs, 'benchmarks/renaissance/results.csv')
