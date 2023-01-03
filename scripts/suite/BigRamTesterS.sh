@@ -22,7 +22,7 @@ cd "$BINDIR"
 
 info "Executing $RUNS test run(s)"
 for i in $(seq $RUNS); do
-    HEAP_FLAGS="-Xmx8G -Xms8G"
+    HEAP_FLAGS="-Xmx8G -Xms8G -XX:-UseLargePages"
     JAVA_OPTIONS="$JAVA_OPTIONS $HEAP_FLAGS" _JAVA_OPTIONS="$_JAVA_OPTIONS $HEAP_FLAGS" JAVA_OPTS="$JAVA_OPTS $HEAP_FLAGS" \
     "$JAVA_HOME/bin/java" $(java_gc_log_flags $GC_LOGS/$i.log) $(jfr_flags $JFR_DIR) BigRamTesterS
 done
