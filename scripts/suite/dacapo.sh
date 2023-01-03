@@ -8,11 +8,20 @@ source "$BENCHMARK_SUITE_RUNNER_DIR/scripts/common.sh"
 RESULTS="$BENCHMARK_RESULT_DIR/results.csv"
 GC_LOGS="$BENCHMARK_RESULT_DIR/gc_logs"
 TMPFILE="$BENCHMARK_TMPDIR/output.log"
-INCLUDED="avrora batik biojava eclipse fop graphchi h2 jme jython luindex lusearch pmd sunflow xalan zxing"
-EXCLUDED="cassandra h2o kafka tomcat tradebeans tradesoap"
 
-info "Running DaCapo benchmarks: $INCLUDED"
-warn "Excluded benchmarks: $EXCLUDED"
+declare -A BENCHMARKS=(
+    ["batik"]="1000M"
+    ["biojava"]="600M"
+    ["eclipse"]="500M"
+    ["fop"]="100M"
+    ["graphchi"]="256M"
+    ["jython"]="150M"
+    ["luindex"]="25M"
+    ["lusearch"]="30M"
+    ["sunflow"]="120M"
+    ["xalan"]="50M"
+    ["zxing"]="250M"
+)
 
 mkdir "$GC_LOGS"
 if [[ "x$JFR_ENABLE" == "xtrue" ]]; then
@@ -21,12 +30,20 @@ if [[ "x$JFR_ENABLE" == "xtrue" ]]; then
 fi
 
 cd "$BENCHMARK_TMPDIR"
-HEAP_SIZES="-Xmx2G -Xms2G"
-export JAVA_OPTIONS="$JAVA_OPTIONS $HEAP_SIZES"
-export _JAVA_OPTIONS="$_JAVA_OPTIONS $HEAP_SIZES"
-export JAVA_OPTS="$JAVA_OPTS $HEAP_SIZES"
-$JAVA_HOME/bin/java $(java_gc_log_flags $GC_LOGS/gc.log) $(jfr_flags $JFR_DIR) -jar "$BENCHMARK_SUITE_BASE_DIR/dacapo-evaluation-git+309e1fa.jar" \
-    $INCLUDED 2>&1 | tee "$TMPFILE"
+
+for BENCHMARK_NAME in "${!BENCHMARKS[@]}"; do
+    HEAP_SIZE="${BENCHMARKS[$BENCHMARK_NAME]}"
+    info "Running DaCapo $BENCHMARK_NAME with $HEAP_SIZE heap"
+    HEAP_FLAGS="-Xmx$HEAP_SIZE -Xms$HEAP_SIZE"
+    if [[ "x$JFR_ENABLE" == "xtrue" ]]; then
+        mkdir -p "$JFR_DIR/$BENCHMARK_NAME"
+    fi
+    JAVA_OPTIONS="$JAVA_OPTIONS $HEAP_FLAGS" _JAVA_OPTIONS="$_JAVA_OPTIONS $HEAP_FLAGS" JAVA_OPTS="$JAVA_OPTS $HEAP_FLAGS" \
+    $JAVA_HOME/bin/java $(java_gc_log_flags $GC_LOGS/$BENCHMARK_NAME.gc.log) $(jfr_flags $JFR_DIR/$BENCHMARK_NAME) \
+        -jar "$BENCHMARK_SUITE_BASE_DIR/dacapo-evaluation-git+309e1fa.jar" \
+        -C "$BENCHMARK_NAME" \
+        2>&1 | tee -a "$TMPFILE"
+done
 
 echo "Benchmark,Time (msec)" > "$RESULTS"
 cat "$TMPFILE" | sed -nr 's/=+\s*DaCapo*\s[a-zA-Z0-9+-]+\s*([a-zA-Z0-9]+)\s*PASSED\s*in\s*([0-9]+)\s*msec\s*=+/\1,\2/p' >> "$RESULTS"
