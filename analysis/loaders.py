@@ -4,14 +4,25 @@ from typing import List
 import pandas
 import os
 import math
+from scipy.stats import t as student
 
-def q05(x):
-    return x.quantile(0.05)
+def confidence_interval(df: pandas.DataFrame, confidence: float):
+    mean = df.mean()
+    std_dev = df.std()
+    sample_size = len(df)
+    degrees_of_freedom = sample_size - 1
+    confidence_one_sided = 0.5 + confidence / 2 if confidence > 0.5 else confidence / 2
+    t_val = student.ppf(confidence_one_sided, degrees_of_freedom)
+    interval = t_val * std_dev / math.sqrt(sample_size)
+    return mean + interval
 
-def q95(x):
-    return x.quantile(0.95)
+def p05(x):
+    return confidence_interval(x, 0.05)
 
-AGG_FN = ['mean', 'min', 'max', 'count', 'std', q05, q95]
+def p95(x):
+    return confidence_interval(x, 0.95)
+
+AGG_FN = ['mean', 'min', 'max', 'count', 'std', p05, p95]
 AGG_COLUMNS = ['Mean', 'Min', 'Max', 'Count', 'Std. Dev', '5th Percentile', '95th Percentile']
 
 def load_csv_frames(benchmark_runs: List[Path], filename: str) -> pandas.DataFrame:
