@@ -31,13 +31,22 @@ def eval_comparison(baseline: BenchmarkRun, benchmark_run_set: List[BenchmarkRun
 
     df = pandas.concat(data_frames)
     df = df.pivot_table(index=pandas_index, columns=['BenchmarkRunID'], values=['Mean', '5th Percentile', '95th Percentile']).swaplevel(axis='columns')
-    df.sort_index(axis=1, inplace=True)
     divisor = df[(baseline.name, 'Mean')]
     benchmark_names, value_columns = df.columns.levels
     for benchmark_name in benchmark_names:
         for value_column in value_columns:
             key = (benchmark_name, value_column)
             df[key] = df[key] / divisor
+
+    baseline_mean = df[(baseline.name, 'Mean')]
+    for benchmark_name in benchmark_names:
+        benchmark_mean = df[(benchmark_name, 'Mean')]
+        improvement_key = (benchmark_name, 'Improvement')
+        if reverse_delta_sign:
+            df[improvement_key] = baseline_mean - benchmark_mean
+        else:
+            df[improvement_key] = benchmark_mean - baseline_mean
+    df.sort_index(axis=1, inplace=True)
     return df
 
 def compare_compiler_speed(baseline_locator: BenchmarkRunLocator, comparison_locators: List[BenchmarkRunLocator]):
@@ -118,6 +127,41 @@ def compare_specjvm2008(baseline_locator: BenchmarkRunLocator, comparison_locato
     ]
     return eval_comparison(baseline, comparison, ['Benchmark'])
 
+def calculate_improvements(compiler_speed: pandas.DataFrame, name: str) -> pandas.DataFrame:
+    compiler_speed_improvements = (compiler_speed.loc[:, (compiler_speed.columns.get_level_values(1) == 'Improvement')]
+        .droplevel(1, axis=1)
+        .mean(axis=0)
+        .to_frame(name=name)
+        .pivot_table(columns=['BenchmarkRunID'], values=[name]))
+    compiler_speed_improvements.index.rename('Benchmark', inplace=True)
+    compiler_speed_improvements.columns.rename('', inplace=True)
+    return compiler_speed_improvements
+
+def calculate_all_improvements(compiler_speed: pandas.DataFrame,
+                               dacapo: pandas.DataFrame,
+                               dacapo_large: pandas.DataFrame,
+                               dacapo_huge: pandas.DataFrame,
+                               delay_inducer: pandas.DataFrame,
+                               jbb2005: pandas.DataFrame,
+                               optaplanner: pandas.DataFrame,
+                               pjbb2005_msec: pandas.DataFrame,
+                               pjbb2005_throughput: pandas.DataFrame,
+                               renaissance: pandas.DataFrame,
+                               rubykon: pandas.DataFrame,
+                               specjvm2008: pandas.DataFrame) -> pandas.DataFrame:
+    return pandas.concat([
+        calculate_improvements(compiler_speed, 'CompilerSpeed'),
+        calculate_improvements(pandas.concat([dacapo, dacapo_large, dacapo_huge]), 'DaCapo'),
+        calculate_improvements(delay_inducer, 'DelayInducer'),
+        calculate_improvements(jbb2005, 'jbb2005'),
+        calculate_improvements(optaplanner, 'Optaplanner'),
+        calculate_improvements(pjbb2005_msec, 'pjbb2005 [msec]'),
+        calculate_improvements(pjbb2005_throughput, 'pjbb2005 [throughput]'),
+        calculate_improvements(renaissance, 'Renaissance'),
+        calculate_improvements(rubykon, 'Rubykon'),
+        calculate_improvements(specjvm2008, 'specjvm2008')
+    ])
+
 def locate_benchmark_runs(args: List[str]) -> List[BenchmarkRunLocator]:
     result = list()
     while args:
@@ -135,6 +179,17 @@ def locate_benchmark_runs(args: List[str]) -> List[BenchmarkRunLocator]:
             args = None
         result.append(BenchmarkRunLocator(name, [Path(d) for d in dir_list]))
     return result
+
+def expand_min_max(min_value, max_value, scale):
+    if min_value > 0:
+        min_value = min_value / scale
+    else:
+        min_value = min_value * scale
+    if max_value > 0:
+        max_value = max_value * scale
+    else:
+        max_value = max_value / scale
+    return (min_value, max_value)
 
 def plot_results(data_frame: pandas.DataFrame, title: str, figsize=None):
     benchmark_names, _ = data_frame.columns.levels
@@ -178,12 +233,61 @@ def plot_results(data_frame: pandas.DataFrame, title: str, figsize=None):
         })
         bar_offset += bar_width
     ax.axhline(y=1.0, color='b', linestyle='-', label='Baseline')
+    y_range = expand_min_max(y_range[0], y_range[1], 1.1)
     
     ax.set_title(title)
     ax.set_ylabel('Relative mean')
     ax.set_xticks(x, labels)
     ax.set_xlabel('Benchmark')
-    ax.set_ylim(y_range[0] * 0.9, y_range[1] * 1.1)
+    ax.set_ylim(y_range[0], y_range[1])
+    ax.legend(bbox_to_anchor = (0.5, -0.2), loc='upper center')
+    ax.yaxis.set_minor_locator(AutoMinorLocator())
+    ax.yaxis.grid(True, which='major', linestyle='solid')
+    ax.yaxis.grid(True, which='minor', linestyle='dotted')
+
+    content = BytesIO()
+    fig.tight_layout()
+    fig.savefig(content, bbox_inches='tight', dpi=300, format='png')
+    return content.getvalue()
+
+def plot_improvements(data_frame: pandas.DataFrame, title: str, figsize=None):
+    benchmark_names = data_frame.columns
+    labels = list()
+    bar_groups = dict()
+    y_range = (math.inf, 0)
+    for index, row in data_frame.iterrows():
+        labels.append(str(index))
+        for benchmark_name in benchmark_names:
+            bar_data = (str(index), row[benchmark_name])
+            if benchmark_name not in bar_groups:
+                bar_groups[benchmark_name] = list()
+            bar_groups[benchmark_name].append(bar_data)
+            y_range = (
+                min(y_range[0], bar_data[1]),
+                max(y_range[1], bar_data[1])
+            )
+    
+    fig = plt.figure(figsize=figsize or (25, 10))
+    ax = fig.add_subplot()
+    x = np.arange(len(labels))
+    group_width = 1.0 / len(labels)
+    bar_width = 0.5 / len(bar_groups)
+    bar_offset = -0.25
+    for bar_label, bars in bar_groups.items():
+        bar_values = [
+            mean
+            for _, mean in bars
+        ]
+        ax.bar(x + bar_offset, bar_values, bar_width, label=bar_label)
+        bar_offset += bar_width
+    ax.axhline(y=0.0, color='b', linestyle='-', label='Baseline')
+    y_range = expand_min_max(y_range[0], y_range[1], 1.1)
+    
+    ax.set_title(title)
+    ax.set_ylabel('Relative mean')
+    ax.set_xticks(x, labels)
+    ax.set_xlabel('Benchmark')
+    ax.set_ylim(y_range[0], y_range[1])
     ax.legend(bbox_to_anchor = (0.5, -0.2), loc='upper center')
     ax.yaxis.set_minor_locator(AutoMinorLocator())
     ax.yaxis.grid(True, which='major', linestyle='solid')
@@ -211,6 +315,11 @@ def run(args: List[str]):
     rubykon = compare_rubykon(baseline_benchmark_runs, benchmark_run_sets)
     specjvm2008 = compare_specjvm2008(baseline_benchmark_runs, benchmark_run_sets)
 
+    improvements = calculate_all_improvements(compiler_speed, dacapo, dacapo_large,
+                               dacapo_huge, delay_inducer, jbb2005,
+                               optaplanner, pjbb2005_msec, pjbb2005_throughput,
+                               renaissance, rubykon, specjvm2008)
+
     compiler_speed_plot = plot_results(compiler_speed, 'CompilerSpeed [compiles/sec]')
     dacapo_plot = plot_results(dacapo, 'DaCapo [msec]')
     dacapo_large_plot = plot_results(dacapo_large, 'DaCapo Large [msec]')
@@ -223,6 +332,7 @@ def run(args: List[str]):
     renaissance_plot = plot_results(renaissance, 'Renaissance [msec]')
     rubykon_plot = plot_results(rubykon, 'Rubykon [performance]')
     specjvm2008_plot = plot_results(specjvm2008, 'specjvm2008 [ops/m]', figsize=(50, 10))
+    improvements_plot = plot_improvements(improvements, 'Improvements [to baseline]')
 
     with zipfile.ZipFile(archive_output, 'w') as archive:
         archive.writestr('CompilerSpeed.csv', compiler_speed.to_csv())
@@ -237,6 +347,7 @@ def run(args: List[str]):
         archive.writestr('Renaissance.csv', renaissance.to_csv())
         archive.writestr('Rubykon.csv', rubykon.to_csv())
         archive.writestr('specjvm2008.csv', specjvm2008.to_csv())
+        archive.writestr('improvements.csv', improvements.to_csv())
 
         archive.writestr('plots/CompilerSpeed.png', compiler_speed_plot)
         archive.writestr('plots/DaCapo.png', dacapo_plot)
@@ -250,6 +361,7 @@ def run(args: List[str]):
         archive.writestr('plots/renaissance.png', renaissance_plot)
         archive.writestr('plots/rubykon.png', rubykon_plot)
         archive.writestr('plots/specjvm2008.png', specjvm2008_plot)
+        archive.writestr('plots/improvements.png', improvements_plot)
 
 if __name__ == '__main__':
     try:
