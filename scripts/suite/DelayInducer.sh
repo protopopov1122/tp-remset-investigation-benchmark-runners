@@ -24,12 +24,15 @@ echo "Wall clock time (ms)" > "$RESULTS"
 run_bench () {
     local counter="$1"
 
+    HEAP_FLAGS="-Xmx3G -Xms3G"
     cd "$BINDIR"
     if [[ -x "/usr/bin/time" ]]; then
+        JAVA_OPTIONS="$JAVA_OPTIONS $HEAP_FLAGS" _JAVA_OPTIONS="$_JAVA_OPTIONS $HEAP_FLAGS" JAVA_OPTS="$JAVA_OPTS $HEAP_FLAGS" \
         /usr/bin/time -v "$JAVA_HOME/bin/java" $(java_gc_log_flags $GC_LOGS/$counter.log) $(jfr_flags $JFR_DIR) DelayInducer 2>&1 | tee "$TMPFILE"
         wallclock_time="$(sed -nr 's/^.*wall clock.*(([0-9]+):([0-9]+)\.([0-9]+))$/\2:\3:\4/p' $TMPFILE | awk -F: '{ print $1*60000+$2*1000+$3*10 }')"
         echo $wallclock_time >> "$RESULTS"
     else
+        JAVA_OPTIONS="$JAVA_OPTIONS $HEAP_FLAGS" _JAVA_OPTIONS="$_JAVA_OPTIONS $HEAP_FLAGS" JAVA_OPTS="$JAVA_OPTS $HEAP_FLAGS" \
         bash -c "time $JAVA_HOME/bin/java $(java_gc_log_flags $GC_LOGS/$counter.log) $(jfr_flags $JFR_DIR) DelayInducer" 2>&1 | tee "$TMPFILE"
         wallclock_time="$(sed -nr 's/^real\s*(([0-9]+)m([0-9]+)[,\.]([0-9]+)s)$/\2:\3:\4/p' $TMPFILE | awk -F: '{ print $1*60000+$2*1000+$3 }')"
         echo $wallclock_time >> "$RESULTS"
