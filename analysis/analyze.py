@@ -248,6 +248,7 @@ def plot_results(data_frame: pandas.DataFrame, title: str, figsize=None):
     content = BytesIO()
     fig.tight_layout()
     fig.savefig(content, bbox_inches='tight', dpi=300, format='png')
+    plt.close()
     return content.getvalue()
 
 def plot_improvements(data_frame: pandas.DataFrame, title: str, figsize=None):
@@ -296,6 +297,7 @@ def plot_improvements(data_frame: pandas.DataFrame, title: str, figsize=None):
     content = BytesIO()
     fig.tight_layout()
     fig.savefig(content, bbox_inches='tight', dpi=300, format='png')
+    plt.close()
     return content.getvalue()
 
 def run(args: List[str]):

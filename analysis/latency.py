@@ -171,6 +171,55 @@ def plot_latencies(data_frame: pandas.DataFrame, benchmark_index: str, title: st
     content = BytesIO()
     fig.tight_layout()
     fig.savefig(content, bbox_inches='tight', dpi=300, format='png')
+    plt.close()
+    return content.getvalue()
+
+def plot_counts(data_frame: pandas.DataFrame, benchmark_index: str, title: str, figsize=None):
+    benchmark_names = data_frame.columns
+    labels = list()
+    bar_groups = dict()
+    y_range = (math.inf, 0)
+    row = data_frame.loc[[benchmark_index]]
+    labels.append(benchmark_index)
+    for benchmark_name in benchmark_names:
+        bar_data = (benchmark_index, row.at[benchmark_index, benchmark_name])
+        if benchmark_name not in bar_groups:
+            bar_groups[benchmark_name] = list()
+        bar_groups[benchmark_name].append(bar_data)
+        y_range = (
+            min(y_range[0], bar_data[1]),
+            max(y_range[1], bar_data[1])
+        )
+    
+    fig = plt.figure(figsize=figsize or (25, 10))
+    ax = fig.add_subplot()
+    x = np.arange(len(labels))
+    group_width = 1.0 / len(labels)
+    bar_width = 0.5 / len(bar_groups)
+    bar_offset = -0.25
+    for bar_label, bars in bar_groups.items():
+        bar_values = [
+            count
+            for _, count in bars
+        ]
+        ax.bar(x + bar_offset, bar_values, bar_width, label=bar_label)
+        bar_offset += bar_width
+    y_range = expand_min_max(0, y_range[1], 1.1)
+    
+    ax.set_title(title)
+    ax.set_ylabel('Number of GCs')
+    ax.set_xticks(x, labels)
+    ax.set_xlabel('Benchmark')
+    ax.set_ylim(y_range[0], y_range[1])
+    ax.legend(bbox_to_anchor = (0.5, -0.2), loc='upper center')
+    ax.yaxis.set_minor_locator(AutoMinorLocator())
+    ax.yaxis.grid(True, which='major', linestyle='solid')
+    ax.yaxis.grid(True, which='minor', linestyle='dotted')
+
+    content = BytesIO()
+    fig.tight_layout()
+    fig.savefig(content, bbox_inches='tight', dpi=300, format='png')
+    plt.close()
     return content.getvalue()
 
 def run(args: List[str]):
@@ -187,6 +236,7 @@ def run(args: List[str]):
         axis=1)
 
     gc_counts = latencies.loc[:, (latencies.columns.get_level_values(1) == 'count')]
+    gc_counts = gc_counts.droplevel(1, axis=1)
 
     bigramtester_latency_plot = plot_latencies(latencies, 'BigRamTesterS', 'BigRamTesterS GC Latencies')
     compiler_speed_latency_plot = plot_latencies(latencies, 'CompilerSpeed', 'CompilerSpeed GC Latencies')
@@ -201,23 +251,48 @@ def run(args: List[str]):
     rubykon_latency_plot = plot_latencies(latencies, 'rubykon', 'Rubykon GC Latencies')
     specjvm2008_latency_plot = plot_latencies(latencies, 'specjvm2008', 'specjvm2008 GC Latencies')
 
+    bigramtester_count_plot = plot_counts(gc_counts, 'BigRamTesterS', 'BigRamTesterS: Number of GCs')
+    compiler_speed_count_plot = plot_counts(gc_counts, 'CompilerSpeed', 'CompilerSpeed: Number of GCs')
+    dacapo_count_plot = plot_counts(gc_counts, 'dacapo', 'DaCapo: Number of GCs')
+    dacapo_large_count_plot = plot_counts(gc_counts, 'dacapo_large', 'DaCapo Large: Number of GCs')
+    dacapo_huge_count_plot = plot_counts(gc_counts, 'dacapo_huge', 'DaCapo Huge: Number of GCs')
+    delay_inducer_count_plot = plot_counts(gc_counts, 'DelayInducer', 'DelayInducer: Number of GCs')
+    jbb2005_count_plot = plot_counts(gc_counts, 'jbb2005', 'jbb2005: Number of GCs')
+    optaplanner_count_plot = plot_counts(gc_counts, 'optaplanner', 'Optaplanner: Number of GCs')
+    pjbb2005_count_plot = plot_counts(gc_counts, 'pjbb2005', 'pjbb2005: Number of GCs')
+    renaissance_count_plot = plot_counts(gc_counts, 'renaissance', 'Renaissance: Number of GCs')
+    rubykon_count_plot = plot_counts(gc_counts, 'rubykon', 'Rubykon: Number of GCs')
+    specjvm2008_count_plot = plot_counts(gc_counts, 'specjvm2008', 'specjvm2008: Number of GCs')
+
     with zipfile.ZipFile(archive_output, 'w') as archive:
         archive.writestr('latencies.csv', latencies.to_csv())
         archive.writestr('causes.csv', causes.to_csv())
-        archive.writestr('gc_counts.csv', gc_counts.to_csv())
 
-        archive.writestr('plots/BigRamTesterS.png', bigramtester_latency_plot)
-        archive.writestr('plots/CompilerSpeed.png', compiler_speed_latency_plot)
-        archive.writestr('plots/DaCapo.png', dacapo_latency_plot)
-        archive.writestr('plots/DaCapo_Large.png', dacapo_large_latency_plot)
-        archive.writestr('plots/DaCapo_Huge.png', dacapo_huge_latency_plot)
-        archive.writestr('plots/DelayInducer.png', delay_inducer_latency_plot)
-        archive.writestr('plots/jbb2005.png', jbb2005_latency_plot)
-        archive.writestr('plots/Optaplanner.png', optaplanner_latency_plot)
-        archive.writestr('plots/pjbb2005.png', pjbb2005_latency_plot)
-        archive.writestr('plots/Renaissance.png', renaissance_latency_plot)
-        archive.writestr('plots/Rubykon.png', rubykon_latency_plot)
-        archive.writestr('plots/specjvm2008.png', specjvm2008_latency_plot)
+        archive.writestr('plots/latency/BigRamTesterS.png', bigramtester_latency_plot)
+        archive.writestr('plots/latency/CompilerSpeed.png', compiler_speed_latency_plot)
+        archive.writestr('plots/latency/DaCapo.png', dacapo_latency_plot)
+        archive.writestr('plots/latency/DaCapo_Large.png', dacapo_large_latency_plot)
+        archive.writestr('plots/latency/DaCapo_Huge.png', dacapo_huge_latency_plot)
+        archive.writestr('plots/latency/DelayInducer.png', delay_inducer_latency_plot)
+        archive.writestr('plots/latency/jbb2005.png', jbb2005_latency_plot)
+        archive.writestr('plots/latency/Optaplanner.png', optaplanner_latency_plot)
+        archive.writestr('plots/latency/pjbb2005.png', pjbb2005_latency_plot)
+        archive.writestr('plots/latency/Renaissance.png', renaissance_latency_plot)
+        archive.writestr('plots/latency/Rubykon.png', rubykon_latency_plot)
+        archive.writestr('plots/latency/specjvm2008.png', specjvm2008_latency_plot)
+
+        archive.writestr('plots/gc_count/BigRamTesterS.png', bigramtester_count_plot)
+        archive.writestr('plots/gc_count/CompilerSpeed.png', compiler_speed_count_plot)
+        archive.writestr('plots/gc_count/DaCapo.png', dacapo_count_plot)
+        archive.writestr('plots/gc_count/DaCapo_Large.png', dacapo_large_count_plot)
+        archive.writestr('plots/gc_count/DaCapo_Huge.png', dacapo_huge_count_plot)
+        archive.writestr('plots/gc_count/DelayInducer.png', delay_inducer_count_plot)
+        archive.writestr('plots/gc_count/jbb2005.png', jbb2005_count_plot)
+        archive.writestr('plots/gc_count/Optaplanner.png', optaplanner_count_plot)
+        archive.writestr('plots/gc_count/pjbb2005.png', pjbb2005_count_plot)
+        archive.writestr('plots/gc_count/Renaissance.png', renaissance_count_plot)
+        archive.writestr('plots/gc_count/Rubykon.png', rubykon_count_plot)
+        archive.writestr('plots/gc_count/specjvm2008.png', specjvm2008_count_plot)
 
 if __name__ == '__main__':
     try:
